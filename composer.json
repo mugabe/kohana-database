@@ -1,5 +1,5 @@
 {
-	"name":        "kohana/database",
+	"name":        "mugabe/kohana-database",
 	"type":        "kohana-module",
 	"description": "The official Kohana module for database interactions, building queries, and prepared statements",
 	"homepage":    "http://kohanaframework.org",
