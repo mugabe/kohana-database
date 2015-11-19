@@ -16,6 +16,12 @@ class Kohana_Database_Query_Builder_Update extends Database_Query_Builder_Where 
 	// SET ...
 	protected $_set = array();
 
+	// The last JOIN statement created
+	protected $_last_join;
+
+	// JOIN ...
+	protected $_join = array();
+
 	/**
 	 * Set the table for a update.
 	 *
@@ -32,6 +38,35 @@ class Kohana_Database_Query_Builder_Update extends Database_Query_Builder_Where 
 
 		// Start the query with no SQL
 		return parent::__construct(Database::UPDATE, '');
+	}
+
+	/**
+	 * Adds addition tables to "JOIN ...".
+	 *
+	 * @param   mixed   $table  column name or array($column, $alias) or object
+	 * @param   string  $type   join type (LEFT, RIGHT, INNER, etc)
+	 * @return  $this
+	 */
+	public function join($table, $type = NULL)
+	{
+		$this->_join[] = $this->_last_join = new Database_Query_Builder_Join($table, $type);
+
+		return $this;
+	}
+
+	/**
+	 * Adds "ON ..." conditions for the last created JOIN statement.
+	 *
+	 * @param   mixed   $c1  column name or array($column, $alias) or object
+	 * @param   string  $op  logic operator
+	 * @param   mixed   $c2  column name or array($column, $alias) or object
+	 * @return  $this
+	 */
+	public function on($c1, $op, $c2)
+	{
+		$this->_last_join->on($c1, $op, $c2);
+
+		return $this;
 	}
 
 	/**
@@ -94,6 +129,12 @@ class Kohana_Database_Query_Builder_Update extends Database_Query_Builder_Where 
 		// Start an update query
 		$query = 'UPDATE '.$db->quote_table($this->_table);
 
+		if ( ! empty($this->_join))
+		{
+			// Add tables to join
+			$query .= ' '.$this->_compile_join($db, $this->_join);
+		}
+
 		// Add the columns to update
 		$query .= ' SET '.$this->_compile_set($db, $this->_set);
 
@@ -123,11 +164,12 @@ class Kohana_Database_Query_Builder_Update extends Database_Query_Builder_Where 
 	public function reset()
 	{
 		$this->_table = NULL;
-
+		$this->_join  =
 		$this->_set   =
 		$this->_where = array();
 
 		$this->_limit = NULL;
+		$this->_last_join = NULL;
 
 		$this->_parameters = array();
 
