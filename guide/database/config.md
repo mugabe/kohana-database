@@ -102,7 +102,7 @@ Every database driver has different connection settings.
 
 ### MySQL
 
-A [MySQL database](http://www.php.net/manual/en/book.mysql.php) can accept the following options in the `connection` array:
+A [MySQL database](http://www.php.net/manual/en/book.mysqli.php) can accept the following options in the `connection` array:
 
 Type      | Option     |  Description               | Default value
 ----------|------------|----------------------------| -------------------------
